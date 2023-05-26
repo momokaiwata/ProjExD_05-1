@@ -11,8 +11,24 @@ MP = 10
 ENE_HP = 10
 
 class Button:
+    """
+    勇者の行動選択ボタンに関するクラス
+    """
     def __init__(self, x, y, width, height, color, hover_color, text, text_color, action, num):
-        self.rect = pg.Rect(x, y, width, height)
+        """
+        初期化メソッド
+        x: ボタンのx座標
+        y: ボタンのy座標
+        width: ボタンの横幅
+        height: ボタンの縦幅
+        color: ボタンの色
+        hover_color: ？
+        text: 行動選択肢の文字
+        text_color: 文字の色
+        action: 行動
+        num: ？
+        """
+        self.rect = pg.Rect(x, y, width, height)    # rectを四角形を描画するsurfaceで初期化
         self.color = color
         self.hover_color = hover_color
         self.text = text
@@ -21,24 +37,39 @@ class Button:
         self.num = num
 
     def draw(self,scr):
-        pg.draw.rect(scr, self.color, self.rect)
-        font = pg.font.SysFont("hg正楷書体pro", 50)
-        text_surface = font.render(self.text, True, self.text_color)
-        text_rect = text_surface.get_rect(center=self.rect.center)
-        scr.blit(text_surface, text_rect)
+        """
+        ボタンを描画するメソッド
+        scr: screen
+        """
+        pg.draw.rect(scr, self.color, self.rect)    # ボタンとなる四角形を描画
+        font = pg.font.SysFont("hg正楷書体pro", 50)  # フォント指定
+        text_surface = font.render(self.text, True, self.text_color)    # テキストsurface
+        text_rect = text_surface.get_rect(center=self.rect.center)      # テキストの中心値指定
+        scr.blit(text_surface, text_rect)   # ボタン描画
 
     def handle_event(self, event):
+        """
+        イベントの切り替えメソッド
+        event: ？
+        """
         if event.type == pg.MOUSEBUTTONDOWN and event.button == 1:
             if self.rect.collidepoint(event.pos):
                 self.action(self.num)
     
         
 def action(i):
+    """
+    勇者の行動に関する関数
+    """
     p = ["攻撃","防御","魔法","回復","調教","逃走"]
     print(p[i])
         
 def main():
+    """
+    main関数
+    """
     global WIDTH,HIGHT,txt_t,txt_origin
+
     bg_image = "./ex05/fig/back.png"
     pg.display.set_caption("RPG初期段階")
     screen = pg.display.set_mode((WIDTH, HIGHT))

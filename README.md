@@ -25,9 +25,21 @@
 #### Buttonクラス
 * 勇者の行動を選択するためのボタンに関するクラス
 ##### 初期化メソッド:
-*
+* 引数:
++ x: ボタンのx座標
++ y: ボタンのy座標
++ width: ボタンの横幅
++ height: ボタンの縦幅
++ color: ボタンの色
++ hover_color: ？
++ text: 行動選択肢の文字
++ text_color: 文字の色
++ action: 行動
++ num: ？
 ##### drawメソッド:
-*
+* 勇者の行動選択肢のボタンを描画するメソッド
+* 引数:
++ scr: screen
 ##### handle_eventメソッド:
 *
 #### action関数
