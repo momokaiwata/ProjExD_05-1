@@ -51,11 +51,13 @@ class Button:
     def handle_event(self, event):
         """
         イベントの切り替えメソッド
-        event: ？
+        event: event
         """
+        # マウスボタンが押されたかつ左クリック(event.button == 1)の場合
         if event.type == pg.MOUSEBUTTONDOWN and event.button == 1:
+            # マウスの座標がボタンの範囲内にあれば
             if self.rect.collidepoint(event.pos):
-                self.action(self.num)
+                self.action(self.num)   # action関数を実行
     
         
 def action(i):
