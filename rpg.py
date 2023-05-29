@@ -58,23 +58,7 @@ class Button:
         if event.type == pg.MOUSEBUTTONDOWN and event.button == 1:
             # マウスの座標がボタンの範囲内にあれば
             if self.rect.collidepoint(event.pos):
-                act = self.action(self.num)   # action関数を実行
-
-    # def judge_act(self):
-    #     if self.action == 0:
-    #         return "攻撃"
-    #     elif self.action == 1:
-    #         return "防御"
-    #     elif self.action == 2:
-    #         return "魔法"
-    #     elif self.action == 3:
-    #         return "回復"
-    #     elif self.action == 4:
-    #         return "調教"
-    #     elif self.action == 5:
-    #         return "逃走"
-    #     else:
-    #         return None
+                self.action(self.num)   # action関数を実行
         
 def action(i):
     """
@@ -92,8 +76,6 @@ def action(i):
         ENE_HP -= fight_p   # スライムのHPを3減らす
     if ENE_HP <= 0:         # スライムのHPが0以下になったら
         ENE_HP = 0          # スライムのHPを0にする
-
-    return i
         
 def main():
     """
@@ -127,7 +109,6 @@ def main():
     text = "野生のスライムが現れた"
     fight_txt = "スライムを倒した！"
     txt = []    # 選択ボタンを描画するsurfaceのリスト
-
     # 勇者の行動選択ボタンを描画するsurfaceを作成しリストtxtに追加
     for i,tx in enumerate(txt_origin):
         # インスタンス化
@@ -156,11 +137,11 @@ def main():
         screen.blit(win2,[50, 50])      # 行動選択のテキストボックス描画
         
         # 攻撃エフェクト
-        # toka -= 10
-        # if toka < 0:
-        #     toka = 255
-        # fight_img.set_alpha(toka)
-        # screen.blit(fight_img,[200, 100])
+        toka -= 10
+        if toka < 0:
+            toka = 255
+        fight_img.set_alpha(toka)
+        screen.blit(fight_img,[200, 100])
 
         if ENE_HP <= 0:
             text = fight_txt
