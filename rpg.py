@@ -65,14 +65,25 @@ def action(i):
     勇者の行動をプリントする関数
     i: index (0:攻撃, 1:防御, 2:魔法, 3:回復, 4:調教, 5:逃走)
     """
+    global HP, ENE_HP
+
     p = ["攻撃","防御","魔法","回復","調教","逃走"]
     print(p[i])
+
+    # 攻撃処理
+    if i == 0:
+        fight_p = 3
+        ENE_HP -= fight_p
+    if ENE_HP <= 0:
+            ENE_HP = 0
+
+    print(ENE_HP)
         
 def main():
     """
     main関数
     """
-    global WIDTH, HIGHT, txt_t, txt_origin     # global変数
+    global WIDTH, HIGHT, txt_origin, HP, ENE_HP    # global変数
 
     bg_image = "./ex05/fig/back.png"
     pg.display.set_caption("RPG of くそげー")   # ウィンドウの名前
@@ -95,8 +106,7 @@ def main():
     # テキスト
     text = "野生のスライムが現れた"
     txt = []    # 選択ボタンを描画するsurfaceのリスト
-    text_surface1 = font2.render(f"HP:{HP} MP:{MP}", True, (255,255,255))   # 勇者のHP,MPのテキストsurface
-    text_surface2 = font2.render(f"HP:{ENE_HP}", True, (255,255,255))       # 敵スライムのHPのテキストsurface
+
     # 勇者の行動選択ボタンを描画するsurfaceを作成しリストtxtに追加
     for i,tx in enumerate(txt_origin):
         # インスタンス化
@@ -128,9 +138,12 @@ def main():
         for i in txt:
             i.draw(screen)  # ボタン描画
 
+        text_surface1 = font2.render(f"HP:{HP} MP:{MP}", True, (255,255,255))   # 勇者のHP,MPのテキストsurface
+        text_surface2 = font2.render(f"HP:{ENE_HP}", True, (255,255,255))       # 敵スライムのHPのテキストsurface
         screen.blit(text_surface1,[100, 350])   # 勇者のHP,MP表示
         screen.blit(text_surface2,[WIDTH/2-ene_rct.width/2+225, HIGHT/2-50])    # 敵スライムのHP表示
         
+        print(ENE_HP)
         pg.display.update()     # ディスプレイのアップデート
         clock.tick(100)         # 時間
 
