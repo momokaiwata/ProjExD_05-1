@@ -2,6 +2,7 @@ import math
 import random
 import sys
 import pygame as pg
+import time
 
 # global変数
 WIDTH = 1600    # ウィンドウの横幅
@@ -57,12 +58,27 @@ class Button:
         if event.type == pg.MOUSEBUTTONDOWN and event.button == 1:
             # マウスの座標がボタンの範囲内にあれば
             if self.rect.collidepoint(event.pos):
-                self.action(self.num)   # action関数を実行
-    
+                act = self.action(self.num)   # action関数を実行
+
+    # def judge_act(self):
+    #     if self.action == 0:
+    #         return "攻撃"
+    #     elif self.action == 1:
+    #         return "防御"
+    #     elif self.action == 2:
+    #         return "魔法"
+    #     elif self.action == 3:
+    #         return "回復"
+    #     elif self.action == 4:
+    #         return "調教"
+    #     elif self.action == 5:
+    #         return "逃走"
+    #     else:
+    #         return None
         
 def action(i):
     """
-    勇者の行動をプリントする関数
+    勇者の行動に関する関数
     i: index (0:攻撃, 1:防御, 2:魔法, 3:回復, 4:調教, 5:逃走)
     """
     global HP, ENE_HP
@@ -71,13 +87,13 @@ def action(i):
     print(p[i])
 
     # 攻撃処理
-    if i == 0:
-        fight_p = 3
-        ENE_HP -= fight_p
-    if ENE_HP <= 0:
-            ENE_HP = 0
+    fight_p = HP / 20       # 勇者の攻撃力
+    if i == 0:              # 攻撃ボタンが押されたら
+        ENE_HP -= fight_p   # スライムのHPを3減らす
+    if ENE_HP <= 0:         # スライムのHPが0以下になったら
+        ENE_HP = 0          # スライムのHPを0にする
 
-    print(ENE_HP)
+    return i
         
 def main():
     """
@@ -96,6 +112,10 @@ def main():
     # 敵スライム
     ene_img = pg.image.load("./ex05/fig/ene.png")
     ene_rct = ene_img.get_rect()
+    # 攻撃エフェクト
+    toka = 255    # 攻撃エフェクトの透過度
+    fight_img = pg.image.load("./ex05/fig/fight_effect.png")
+    fight_img = pg.transform.scale(fight_img,(WIDTH,HIGHT))
     # テキストボックス
     win = pg.image.load("./ex05/fig/win.png")
     win = pg.transform.scale(win,(WIDTH/4,HIGHT/2))
@@ -105,6 +125,7 @@ def main():
     font2 = pg.font.SysFont("hg正楷書体pro", 50)
     # テキスト
     text = "野生のスライムが現れた"
+    fight_txt = "スライムを倒した！"
     txt = []    # 選択ボタンを描画するsurfaceのリスト
 
     # 勇者の行動選択ボタンを描画するsurfaceを作成しリストtxtに追加
@@ -121,14 +142,28 @@ def main():
         for event in pg.event.get():
             if event.type == pg.QUIT: return    # ×ボタンが押されたらプログラム終了
 
-            for button in txt:                  # ？
+            for button in txt:                  # 勇者の行動処理
                 button.handle_event(event)
+
+            # if button == txt[0]:
+            #     screen.blit(fight_img,[200, 100])
+            #     time.sleep(3)
+            #     print(333333)
 
         screen.blit(bg_img,[0, 0])      # 背景描画
         screen.blit(ene_img,[WIDTH/2-ene_rct.width/2+100, HIGHT/2]) # 敵スライム描画
         screen.blit(win,[50, 400])      # テキストボックス描画
         screen.blit(win2,[50, 50])      # 行動選択のテキストボックス描画
+        
+        # 攻撃エフェクト
+        # toka -= 10
+        # if toka < 0:
+        #     toka = 255
+        # fight_img.set_alpha(toka)
+        # screen.blit(fight_img,[200, 100])
 
+        if ENE_HP <= 0:
+            text = fight_txt
         x = 200
         for chr in text:
             rendered_text = font1.render(chr, True, (255, 255, 255))
@@ -143,7 +178,17 @@ def main():
         screen.blit(text_surface1,[100, 350])   # 勇者のHP,MP表示
         screen.blit(text_surface2,[WIDTH/2-ene_rct.width/2+225, HIGHT/2-50])    # 敵スライムのHP表示
         
-        print(ENE_HP)
+        # if button.judge_act() == "攻撃":
+        #     screen.blit(fight_img,[200, 100])
+        #     # time.sleep(3)
+        #     print(333333)
+
+        # スライムを倒したら、画面を5秒止めてプログラム終了
+        if ENE_HP <= 0:
+            pg.display.update()
+            time.sleep(4)
+            sys.exit()
+
         pg.display.update()     # ディスプレイのアップデート
         clock.tick(100)         # 時間
 
