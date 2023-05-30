@@ -187,7 +187,7 @@ def ENE_action(PL_action,hp_mp:HP_MP,text:Text, screen, ene_img, attack_slime):
     attack_interval = 5 #攻撃の間隔
     last_attack_time = 0 #攻撃時刻
     keika_time = current_time - last_attack_time
-    for k in range(20):
+    for k in range(30):
         if  keika_time >= attack_interval: #スライムの攻撃
             attack_x = random.randint(0, WIDTH - ene_img.get_width())
             attack_y = random.randint(0, HIGHT - ene_img.get_width())
