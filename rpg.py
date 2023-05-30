@@ -11,6 +11,7 @@ txt_origin = ["攻撃","防御","魔法","回復","調教","逃走"]    # 勇者
 HP = 50         # 勇者のHP
 MP = 10         # 勇者のMP
 ENE_HP = 10     # 敵スライムのHP
+TAME = False
 
 class Button:
     """
@@ -66,10 +67,18 @@ def action(i):
     勇者の行動に関する関数
     i: index (0:攻撃, 1:防御, 2:魔法, 3:回復, 4:調教, 5:逃走)
     """
-    global HP, ENE_HP
+    global HP, ENE_HP, TAME
 
     p = ["攻撃","防御","魔法","回復","調教","逃走"]
     print(p[i])
+
+    #調教：使用時の敵HPによって成功率が変わる
+    if i == 4:
+        m = random.randint(0,10)
+        #i = 0  #絶対成功する
+        if m <= (10 - ENE_HP):
+            print("ていむ成功！！！")
+            TAME = True
 
     # 攻撃処理
     fight_p = HP / 20       # 勇者の攻撃力
@@ -84,7 +93,7 @@ def main():
     """
     main関数
     """
-    global WIDTH, HIGHT, txt_origin, HP, ENE_HP    # global変数
+    global WIDTH, HIGHT, txt_origin, HP, ENE_HP, TAME    # global変数
 
     bg_image = "./ex05/fig/back.png"
     pg.display.set_caption("RPG of くそげー")   # ウィンドウの名前
@@ -129,6 +138,10 @@ def main():
             for button in txt:                  # 勇者の行動処理
                 act = button.handle_event(event)
 
+                #変更箇所
+                if  TAME == True:
+                    text = "ていむ成功！！"
+
                 if act == 0:    # 勇者が攻撃したら
                     # 攻撃エフェクト
                     for i in range(25):
@@ -162,7 +175,7 @@ def main():
         screen.blit(text_surface2,[WIDTH/2-ene_rct.width/2+225, HIGHT/2-50])    # 敵スライムのHP表示
         
         # スライムを倒したら、画面を3秒止めてプログラム終了
-        if ENE_HP <= 0:
+        if ENE_HP <= 0 or TAME == True:
             pg.display.update()
             time.sleep(3)
             sys.exit()
