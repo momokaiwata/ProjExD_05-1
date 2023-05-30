@@ -174,15 +174,6 @@ def action(i, text:Text, hp_mp:HP_MP,screen,fight_img):
 def ENE_action(PL_action,hp_mp:HP_MP,text:Text, screen, ene_img, attack_slime):
     hp = int(hp_mp.hp)
     mp = int(hp_mp.mp)
-    if PL_action=="防御":
-        damege = ENE_ATK - DEF
-        hp -= damege
-        hp_mp.PL(hp,mp)
-    else:
-        damege = ENE_ATK
-        hp -= damege
-        hp_mp.PL(hp,mp)
-    text.text=f"{damege}ダメージくらった"
     current_time = time.time() #ここからワイの実装
     attack_interval = 5 #攻撃の間隔
     last_attack_time = 0 #攻撃時刻
@@ -195,6 +186,15 @@ def ENE_action(PL_action,hp_mp:HP_MP,text:Text, screen, ene_img, attack_slime):
             time.sleep(0.01) #攻撃の速さ
         screen.blit(attack_slime,[attack_x,attack_y]) #ここもワイ
         pg.display.update()
+    if PL_action=="防御":
+        damege = ENE_ATK - DEF
+        hp -= damege
+        hp_mp.PL(hp,mp)
+    else:
+        damege = ENE_ATK
+        hp -= damege
+        hp_mp.PL(hp,mp)
+    text.text=f"{damege}ダメージくらった"
     hp_mp.turn=1
     
     
