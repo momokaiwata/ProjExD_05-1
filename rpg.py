@@ -21,7 +21,7 @@ DEF = 10
 TAM = 5
 TAME_POINT = 20
 ENE_ATK = 10
-
+TAME = 0
 
 class Text:
     def __init__(self,syo):
@@ -32,9 +32,6 @@ class Text:
         text_surface = font.render(self.text, True, text_color)
         text_rect = text_surface.get_rect(center=(x,y))
         scr.blit(text_surface, text_rect)
-        
-ENE_HP = 10     # 敵スライムのHP
-TAME = False
 
 attack_interval = 5 #攻撃の間隔
 last_attack_time = 0 #攻撃時刻
@@ -130,12 +127,14 @@ def action(i, text:Text, hp_mp:HP_MP,screen,fight_img):
     勇者の行動に関する関数
     i: index (0:攻撃, 1:防御, 2:魔法, 3:回復, 4:調教, 5:逃走)
     """
-    global HP, ENE_HP, TAME
+    global HP, ENE_HP, TAME, is_mouse_pressed
 
     p = ["攻撃","防御","魔法","回復","調教","逃走"]
     hp = int(hp_mp.hp)
     mp = int(hp_mp.mp)
     ene_hp = int(hp_mp.e_hp)
+    is_mouse_pressed = False
+
     if hp_mp.turn==1:    
         if txt_origin[i]=="攻撃":
             # 攻撃処理
@@ -157,41 +156,59 @@ def action(i, text:Text, hp_mp:HP_MP,screen,fight_img):
                 screen.blit(fight_img,[200, 100])
                 pg.display.update()
             time.sleep(0.1)
+
         if txt_origin[i]=="防御":
             text.text = "盾を構えた"
             hp_mp.turn = 0
-        if txt_origin[i]=="魔法":
-            if mp>0:
-                ene_hp -= MJC
-                if ene_hp <= 0:         # スライムのHPが0以下になったら
-                    ene_hp = 0      
-                mp-=1
-                hp_mp.turn = 0
-                text.text = f"{MJC}ダメージ与えた"
+
+        #防御押されたら
+        if(i == 1):
+            is_mouse_pressed=True
+
+    #調教：使用時の敵HPによって成功率が変わる
+    if i == 4:
+        m = random.randint(0, ENE_HP)
+        #i = 0  #絶対成功する
+        if m <= (ENE_HP - ene_hp):
+            print("ていむ成功！！！")
+            TAME = 1
+        else:
+            TAME = 2
+        hp_mp.turn = 0
+
+    if txt_origin[i]=="魔法":
+        if mp>0:
+            ene_hp -= MJC
+            if ene_hp <= 0:         # スライムのHPが0以下になったら
+                ene_hp = 0      
+            mp-=1
+            hp_mp.turn = 0
+            text.text = f"{MJC}ダメージ与えた"
+        else:
+            text.text = "MPが足りません"
+        hp_mp.ENE(ene_hp)
+        hp_mp.PL(hp,mp)
+
+    if txt_origin[i]=="回復":
+        if hp<HP and mp>0:
+            nokori=HP-hp
+            if nokori>MJC:
+                hp+=MJC
             else:
-                text.text = "MPが足りません"
-            hp_mp.ENE(ene_hp)
+                hp+=nokori
+            mp-=1
+            if hp>=HP:
+                hp=HP
             hp_mp.PL(hp,mp)
-        if txt_origin[i]=="回復":
-            if hp<HP and mp>0:
-                nokori=HP-hp
-                if nokori>MJC:
-                    hp+=MJC
-                else:
-                    hp+=nokori
-                mp-=1
-                if hp>=HP:
-                    hp=HP
-                hp_mp.PL(hp,mp)
-                text.text = f"{MJC}回復した"
-                hp_mp.turn = 0
-            elif mp<1:
-                text.text = "MPが足りません"
-            elif hp>=50:
-                text.text = "体力が満タンです"
+            text.text = f"{nokori}回復した"
+            hp_mp.turn = 0
+        elif mp<1:
+            text.text = "MPが足りません"
+        elif hp>=50:
+            text.text = "体力が満タンです"
+
     if hp_mp.turn==0:
         hp_mp.PL_action = txt_origin[i]
-
 
 def ENE_action(PL_action,hp_mp:HP_MP,text:Text, screen, ene_img, attack_slime):
     hp = int(hp_mp.hp)
@@ -218,30 +235,6 @@ def ENE_action(PL_action,hp_mp:HP_MP,text:Text, screen, ene_img, attack_slime):
         hp_mp.PL(hp,mp)
     text.text=f"{damege}ダメージくらった"
     hp_mp.turn=1
-    
-    print(p[i])
-
-    #防御押されたら
-    global is_mouse_pressed
-    is_mouse_pressed=False
-    if(i == 1):
-        is_mouse_pressed=True
-
-    #調教：使用時の敵HPによって成功率が変わる
-    if i == 4:
-        m = random.randint(0,10)
-        #i = 0  #絶対成功する
-        if m <= (10 - ENE_HP):
-            print("ていむ成功！！！")
-            TAME = True
-
-    # 攻撃処理
-    fight_p = HP / 20       # 勇者の攻撃力
-    if i == 0:              # 攻撃ボタンが押されたら
-        ENE_HP -= fight_p   # スライムのHPを3減らす
-    if ENE_HP <= 0:         # スライムのHPが0以下になったら
-        ENE_HP = 0          # スライムのHPを0にする
-    
         
 def main():
     """
@@ -273,6 +266,7 @@ def main():
     win2 = pg.transform.scale(win,(WIDTH-100,HIGHT/4))
     # フォント
     font1 = pg.font.SysFont("hg正楷書体pro", 100)
+    font2 = pg.font.SysFont("hg正楷書体pro", 50)
     # テキスト
     syo="野生のスライムが現れた"
     text = Text(syo)
@@ -304,33 +298,15 @@ def main():
         for event in pg.event.get():
             if event.type == pg.QUIT: return    # ×ボタンが押されたらプログラム終了
 
-            if event.type == timer_event: 
-                if not is_mouse_pressed:
-                    HP -= 3
-
             for button in txt:
-                button.handle_event(event)
-                if HP < 0:
-                   HP = 0
-
-            for button in txt:                  # 勇者の行動処理
-                button.handle_event(event,screen,fight_img)
-                act = button.handle_event(event)
+                button.handle_event(event, screen, fight_img)
 
                 #変更箇所
-                if  TAME == True:
-                    text = "ていむ成功！！"
-
-                if act == 0:    # 勇者が攻撃したら
-                    # 攻撃エフェクト
-                    for i in range(25):
-                        toka += 10
-                        if toka > 255:
-                            toka = 0
-                        fight_img.set_alpha(toka)
-                        screen.blit(fight_img,[200, 100])
-                        pg.display.update()
-                    time.sleep(0.1)
+                if  TAME == 1:
+                    text.text = "ていむ成功！！"
+                elif TAME == 2:
+                    text.text = "ていむ失敗..."
+                    TAME = 0
 
         screen.blit(bg_img,[0, 0])      # 背景描画
         screen.blit(ene_img,[WIDTH/2-ene_rct.width/2+100, HIGHT/2]) # 敵スライム描画
@@ -353,19 +329,17 @@ def main():
         pg.display.update()     # ディスプレイのアップデート
         clock.tick(100)         # 時間
 
-            if HP<=0: # HPが0になったら
-                die_text2 = font3.render(die_text, True, (255, 0, 0))
-                screen.blit(die_text2, (600, 450)) # 600, 450の位置に赤色で"You died"を表示する
-                pg.display.update()
-                time.sleep(3)
-                pg.quit()
+        if text_surface.hp<=0: # HPが0になったら
+            die_text2 = font3.render(die_text, True, (255, 0, 0))
+            screen.blit(die_text2, (600, 450)) # 600, 450の位置に赤色で"You died"を表示する
+            pg.display.update()
+            time.sleep(3)
+            pg.quit()
 
-        text_surface1 = font2.render(f"HP:{HP} MP:{MP}", True, (255,255,255))#75行目のをここに移動した。
-
-        text_surface1 = font2.render(f"HP:{HP} MP:{MP}", True, (255,255,255))   # 勇者のHP,MPのテキストsurface
-        text_surface2 = font2.render(f"HP:{ENE_HP}", True, (255,255,255))       # 敵スライムのHPのテキストsurface
-        screen.blit(text_surface1,[100, 350])   # 勇者のHP,MP表示
-        screen.blit(text_surface2,[WIDTH/2-ene_rct.width/2+225, HIGHT/2-50])    # 敵スライムのHP表示
+        if text_surface.e_hp <= 0 or TAME == True:
+            pg.display.update()
+            time.sleep(3)
+            sys.exit()
         
         if text_surface.turn==0:
             time.sleep(1)
@@ -376,16 +350,6 @@ def main():
             time.sleep(1)
             PL_action=text_surface.PL_action
             ENE_action(PL_action,text_surface,text,screen,ene_img,attack_slime)
-            
-        # スライムを倒したら、画面を3秒止めてプログラム終了
-
-        if turn==2:
-
-        if ENE_HP <= 0 or TAME == True:
-            pg.display.update()
-            time.sleep(3)
-            sys.exit()
-
 
 if __name__ == "__main__":
     pg.init()
