@@ -58,7 +58,8 @@ class Button:
         if event.type == pg.MOUSEBUTTONDOWN and event.button == 1:
             # マウスの座標がボタンの範囲内にあれば
             if self.rect.collidepoint(event.pos):
-                self.action(self.num)   # action関数を実行
+                act = self.action(self.num)   # action関数を実行
+                return act
         
 def action(i):
     """
@@ -76,6 +77,8 @@ def action(i):
         ENE_HP -= fight_p   # スライムのHPを3減らす
     if ENE_HP <= 0:         # スライムのHPが0以下になったら
         ENE_HP = 0          # スライムのHPを0にする
+    
+    return i
         
 def main():
     """
@@ -95,7 +98,7 @@ def main():
     ene_img = pg.image.load("./ex05/fig/ene.png")
     ene_rct = ene_img.get_rect()
     # 攻撃エフェクト
-    toka = 255    # 攻撃エフェクトの透過度
+    toka = 0    # 攻撃エフェクトの透過度
     fight_img = pg.image.load("./ex05/fig/fight_effect.png")
     fight_img = pg.transform.scale(fight_img,(WIDTH,HIGHT))
     # テキストボックス
@@ -124,24 +127,23 @@ def main():
             if event.type == pg.QUIT: return    # ×ボタンが押されたらプログラム終了
 
             for button in txt:                  # 勇者の行動処理
-                button.handle_event(event)
+                act = button.handle_event(event)
 
-            # if button == txt[0]:
-            #     screen.blit(fight_img,[200, 100])
-            #     time.sleep(3)
-            #     print(333333)
+                if act == 0:    # 勇者が攻撃したら
+                    # 攻撃エフェクト
+                    for i in range(25):
+                        toka += 10
+                        if toka > 255:
+                            toka = 0
+                        fight_img.set_alpha(toka)
+                        screen.blit(fight_img,[200, 100])
+                        pg.display.update()
+                    time.sleep(0.1)
 
         screen.blit(bg_img,[0, 0])      # 背景描画
         screen.blit(ene_img,[WIDTH/2-ene_rct.width/2+100, HIGHT/2]) # 敵スライム描画
         screen.blit(win,[50, 400])      # テキストボックス描画
         screen.blit(win2,[50, 50])      # 行動選択のテキストボックス描画
-        
-        # 攻撃エフェクト
-        toka -= 10
-        if toka < 0:
-            toka = 255
-        fight_img.set_alpha(toka)
-        screen.blit(fight_img,[200, 100])
 
         if ENE_HP <= 0:
             text = fight_txt
@@ -159,15 +161,10 @@ def main():
         screen.blit(text_surface1,[100, 350])   # 勇者のHP,MP表示
         screen.blit(text_surface2,[WIDTH/2-ene_rct.width/2+225, HIGHT/2-50])    # 敵スライムのHP表示
         
-        # if button.judge_act() == "攻撃":
-        #     screen.blit(fight_img,[200, 100])
-        #     # time.sleep(3)
-        #     print(333333)
-
-        # スライムを倒したら、画面を5秒止めてプログラム終了
+        # スライムを倒したら、画面を3秒止めてプログラム終了
         if ENE_HP <= 0:
             pg.display.update()
-            time.sleep(4)
+            time.sleep(3)
             sys.exit()
 
         pg.display.update()     # ディスプレイのアップデート
