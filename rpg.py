@@ -3,6 +3,9 @@ import random
 import sys
 import pygame as pg
 import time
+from pygame.locals import *
+
+pg.init()
 
 # global変数
 WIDTH = 1600    # ウィンドウの横幅
@@ -12,6 +15,16 @@ HP = 50         # 勇者のHP
 MP = 10         # 勇者のMP
 ENE_HP = 10     # 敵スライムのHP
 TAME = False
+
+attack_interval = 5 #攻撃の間隔
+last_attack_time = 0 #攻撃時刻
+me_defense = 5 #防御力
+clock = pg.time.Clock()
+timer_event = USEREVENT + 1
+pg.time.set_timer(timer_event, 5000) #5秒ごとにイベント発生
+is_defending = False #防御フラグ
+is_mouse_pressed = False
+ene_img = pg.image.load("./ex05/fig/ene.png")
 
 class Button:
     """
@@ -61,6 +74,13 @@ class Button:
             if self.rect.collidepoint(event.pos):
                 act = self.action(self.num)   # action関数を実行
                 return act
+            
+def calculate_damage(damage, defense): #ダメージ計算
+        
+        defense_diff = damage - defense
+        if defense_diff < 0:
+            defense_diff = 0
+        return defense_diff
         
 def action(i):
     """
@@ -71,6 +91,12 @@ def action(i):
 
     p = ["攻撃","防御","魔法","回復","調教","逃走"]
     print(p[i])
+
+    #防御押されたら
+    global is_mouse_pressed
+    is_mouse_pressed=False
+    if(i == 1):
+        is_mouse_pressed=True
 
     #調教：使用時の敵HPによって成功率が変わる
     if i == 4:
@@ -122,6 +148,8 @@ def main():
     fight_txt = "スライムを倒した！"
     txt = []    # 選択ボタンを描画するsurfaceのリスト
     # 勇者の行動選択ボタンを描画するsurfaceを作成しリストtxtに追加
+
+    text_surface2 = font2.render(f"HP:{ENE_HP}", True, (255,255,255))
     font3 = pg.font.SysFont(None, 200)
     die_text = "You died" # 死亡メッセージ
 
@@ -137,6 +165,15 @@ def main():
     while True:
         for event in pg.event.get():
             if event.type == pg.QUIT: return    # ×ボタンが押されたらプログラム終了
+
+            if event.type == timer_event: 
+                if not is_mouse_pressed:
+                    HP -= 3
+
+            for button in txt:
+                button.handle_event(event)
+                if HP < 0:
+                   HP = 0
 
             for button in txt:                  # 勇者の行動処理
                 act = button.handle_event(event)
@@ -177,6 +214,8 @@ def main():
                 pg.display.update()
                 time.sleep(3)
                 pg.quit()
+
+        text_surface1 = font2.render(f"HP:{HP} MP:{MP}", True, (255,255,255))#75行目のをここに移動した。
 
         text_surface1 = font2.render(f"HP:{HP} MP:{MP}", True, (255,255,255))   # 勇者のHP,MPのテキストsurface
         text_surface2 = font2.render(f"HP:{ENE_HP}", True, (255,255,255))       # 敵スライムのHPのテキストsurface
