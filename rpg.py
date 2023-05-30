@@ -273,6 +273,7 @@ def main():
     win2 = pg.transform.scale(win,(WIDTH-100,HIGHT/4))
     # フォント
     font1 = pg.font.SysFont("hg正楷書体pro", 100)
+    font2 = pg.font.SysFont("hg正楷書体pro", 50)
     # テキスト
     syo="野生のスライムが現れた"
     text = Text(syo)
@@ -353,12 +354,12 @@ def main():
         pg.display.update()     # ディスプレイのアップデート
         clock.tick(100)         # 時間
 
-            if HP<=0: # HPが0になったら
-                die_text2 = font3.render(die_text, True, (255, 0, 0))
-                screen.blit(die_text2, (600, 450)) # 600, 450の位置に赤色で"You died"を表示する
-                pg.display.update()
-                time.sleep(3)
-                pg.quit()
+        if HP<=0: # HPが0になったら
+            die_text2 = font3.render(die_text, True, (255, 0, 0))
+            screen.blit(die_text2, (600, 450)) # 600, 450の位置に赤色で"You died"を表示する
+            pg.display.update()
+            time.sleep(3)
+            pg.quit()
 
         text_surface1 = font2.render(f"HP:{HP} MP:{MP}", True, (255,255,255))#75行目のをここに移動した。
 
@@ -379,7 +380,7 @@ def main():
             
         # スライムを倒したら、画面を3秒止めてプログラム終了
 
-        if turn==2:
+        # if turn==2:
 
         if ENE_HP <= 0 or TAME == True:
             pg.display.update()
