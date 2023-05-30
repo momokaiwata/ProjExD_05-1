@@ -113,6 +113,9 @@ def main():
     fight_txt = "スライムを倒した！"
     txt = []    # 選択ボタンを描画するsurfaceのリスト
     # 勇者の行動選択ボタンを描画するsurfaceを作成しリストtxtに追加
+    font3 = pg.font.SysFont(None, 200)
+    die_text = "You died" # 死亡メッセージ
+
     for i,tx in enumerate(txt_origin):
         # インスタンス化
         if i%2==0:
@@ -155,6 +158,12 @@ def main():
             x += text_width
         for i in txt:
             i.draw(screen)  # ボタン描画
+            if HP<=0: # HPが0になったら
+                die_text2 = font3.render(die_text, True, (255, 0, 0))
+                screen.blit(die_text2, (600, 450)) # 600, 450の位置に赤色で"You died"を表示する
+                pg.display.update()
+                time.sleep(3)
+                pg.quit()
 
         text_surface1 = font2.render(f"HP:{HP} MP:{MP}", True, (255,255,255))   # 勇者のHP,MPのテキストsurface
         text_surface2 = font2.render(f"HP:{ENE_HP}", True, (255,255,255))       # 敵スライムのHPのテキストsurface
