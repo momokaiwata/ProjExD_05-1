@@ -141,8 +141,6 @@ def main():
     # 勇者の行動選択ボタンを描画するsurfaceを作成しリストtxtに追加
 
     text_surface2 = font2.render(f"HP:{ENE_HP}", True, (255,255,255))
-    attack_slime = pg.image.load("./ex05/fig/momoka.png")
-    attack_slime = pg.transform.scale(attack_slime, (300, 200))
 
     for i,tx in enumerate(txt_origin):
         # インスタンス化
@@ -180,21 +178,10 @@ def main():
                         pg.display.update()
                     time.sleep(0.1)
 
-        current_time = time.time() #ここからワイの実装
-        attack_interval = 5 #攻撃の間隔
-        last_attack_time = 0 #攻撃時刻
-        keika_time = current_time - last_attack_time
-        if  keika_time >= attack_interval: #スライムの攻撃
-            attack_x = random.randint(0, WIDTH - ene_img.get_width())
-            attack_y = random.randint(0, HIGHT - ene_img.get_width())
-            last_attack_time = current_time
-            time.sleep(0) #攻撃の速さ
-
         screen.blit(bg_img,[0, 0])      # 背景描画
         screen.blit(ene_img,[WIDTH/2-ene_rct.width/2+100, HIGHT/2]) # 敵スライム描画
         screen.blit(win,[50, 400])      # テキストボックス描画
         screen.blit(win2,[50, 50])      # 行動選択のテキストボックス描画
-        screen.blit(attack_slime,[attack_x,attack_y]) #ここもワイ
 
         if ENE_HP <= 0:
             text = fight_txt
@@ -208,7 +195,7 @@ def main():
             i.draw(screen)  # ボタン描画
 
         text_surface1 = font2.render(f"HP:{HP} MP:{MP}", True, (255,255,255))#75行目のをここに移動した。
-        
+
         text_surface1 = font2.render(f"HP:{HP} MP:{MP}", True, (255,255,255))   # 勇者のHP,MPのテキストsurface
         text_surface2 = font2.render(f"HP:{ENE_HP}", True, (255,255,255))       # 敵スライムのHPのテキストsurface
         screen.blit(text_surface1,[100, 350])   # 勇者のHP,MP表示
