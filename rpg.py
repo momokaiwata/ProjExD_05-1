@@ -41,7 +41,7 @@ class Button:
     def draw(self,scr):
         """
         ボタンを描画するメソッド
-        scr: surface
+        scr: display surface
         """
         pg.draw.rect(scr, self.color, self.rect)    # ボタンとなる四角形を描画
         font = pg.font.SysFont("hg正楷書体pro", 50)  # フォント指定
@@ -51,7 +51,7 @@ class Button:
 
     def handle_event(self, event):
         """
-        イベントの切り替えメソッド
+        勇者の行動の切り替えメソッド
         event: event
         """
         # マウスボタンが押されたかつ左クリック(event.button == 1)の場合
