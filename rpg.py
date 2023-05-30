@@ -14,6 +14,7 @@ txt_origin = ["攻撃","防御","魔法","回復","調教","逃走"]    # 勇者
 HP = 50         # 勇者のHP
 MP = 10         # 勇者のMP
 ENE_HP = 10     # 敵スライムのHP
+TAME = False
 
 attack_interval = 5 #攻撃の間隔
 last_attack_time = 0 #攻撃時刻
@@ -86,7 +87,7 @@ def action(i):
     勇者の行動に関する関数
     i: index (0:攻撃, 1:防御, 2:魔法, 3:回復, 4:調教, 5:逃走)
     """
-    global HP, ENE_HP
+    global HP, ENE_HP, TAME
 
     p = ["攻撃","防御","魔法","回復","調教","逃走"]
     print(p[i])
@@ -96,6 +97,14 @@ def action(i):
     is_mouse_pressed=False
     if(i == 1):
         is_mouse_pressed=True
+
+    #調教：使用時の敵HPによって成功率が変わる
+    if i == 4:
+        m = random.randint(0,10)
+        #i = 0  #絶対成功する
+        if m <= (10 - ENE_HP):
+            print("ていむ成功！！！")
+            TAME = True
 
     # 攻撃処理
     fight_p = HP / 20       # 勇者の攻撃力
@@ -110,7 +119,7 @@ def main():
     """
     main関数
     """
-    global WIDTH, HIGHT, txt_origin, HP, ENE_HP    # global変数
+    global WIDTH, HIGHT, txt_origin, HP, ENE_HP, TAME    # global変数
 
     bg_image = "./ex05/fig/back.png"
     pg.display.set_caption("RPG of くそげー")   # ウィンドウの名前
@@ -141,6 +150,8 @@ def main():
     # 勇者の行動選択ボタンを描画するsurfaceを作成しリストtxtに追加
 
     text_surface2 = font2.render(f"HP:{ENE_HP}", True, (255,255,255))
+    font3 = pg.font.SysFont(None, 200)
+    die_text = "You died" # 死亡メッセージ
 
     for i,tx in enumerate(txt_origin):
         # インスタンス化
@@ -166,6 +177,10 @@ def main():
 
             for button in txt:                  # 勇者の行動処理
                 act = button.handle_event(event)
+
+                #変更箇所
+                if  TAME == True:
+                    text = "ていむ成功！！"
 
                 if act == 0:    # 勇者が攻撃したら
                     # 攻撃エフェクト
@@ -193,6 +208,12 @@ def main():
             x += text_width
         for i in txt:
             i.draw(screen)  # ボタン描画
+            if HP<=0: # HPが0になったら
+                die_text2 = font3.render(die_text, True, (255, 0, 0))
+                screen.blit(die_text2, (600, 450)) # 600, 450の位置に赤色で"You died"を表示する
+                pg.display.update()
+                time.sleep(3)
+                pg.quit()
 
         text_surface1 = font2.render(f"HP:{HP} MP:{MP}", True, (255,255,255))#75行目のをここに移動した。
 
@@ -202,7 +223,7 @@ def main():
         screen.blit(text_surface2,[WIDTH/2-ene_rct.width/2+225, HIGHT/2-50])    # 敵スライムのHP表示
         
         # スライムを倒したら、画面を3秒止めてプログラム終了
-        if ENE_HP <= 0:
+        if ENE_HP <= 0 or TAME == True:
             pg.display.update()
             time.sleep(3)
             sys.exit()
